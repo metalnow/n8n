@@ -187,6 +187,25 @@ const properties: INodeProperties[] = [
 					},
 				},
 			},
+			{
+				displayName: 'Provider',
+				name: 'provider',
+				type: 'collection',
+				placeholder: 'Add Provider Option',
+				default: {},
+				options: [
+					{
+						displayName: 'Order',
+						name: 'order',
+						type: 'string',
+						typeOptions: {
+							multipleValues: true,
+						},
+						default: null,
+						description: 'Specify model provider priority',
+					},
+				],
+			},
 		],
 	},
 ];
@@ -252,8 +271,19 @@ export async function execute(this: IExecuteFunctions, i: number): Promise<INode
 		messages,
 		tools,
 		response_format,
-		..._omit(options, ['maxToolsIterations']),
+		..._omit(options, ['maxToolsIterations', 'provider']),
 	};
+
+	// handling provider option
+	if (options.provider && (options.provider as IDataObject).order) {
+		const providerOrder = (options.provider as IDataObject).order as string[];
+		if (providerOrder && providerOrder.length > 0) {
+			// add provider.order to body
+			body.route = {
+				provider_order: providerOrder,
+			};
+		}
+	}	
 
 	let response = (await apiRequest.call(this, 'POST', '/chat/completions', {
 		body,
