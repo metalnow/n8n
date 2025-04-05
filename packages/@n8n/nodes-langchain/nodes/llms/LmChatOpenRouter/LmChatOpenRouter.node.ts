@@ -204,6 +204,25 @@ export class LmChatOpenRouter implements INodeType {
 							'Controls diversity via nucleus sampling: 0.5 means half of all likelihood-weighted options are considered. We generally recommend altering this or temperature but not both.',
 						type: 'number',
 					},
+					{
+						displayName: 'Provider',
+						name: 'provider',
+						type: 'collection',
+						placeholder: 'Add Provider Option',
+						default: {},
+						options: [
+							{
+								displayName: 'Order',
+								name: 'order',
+								type: 'string',
+								typeOptions: {
+									multipleValues: true,
+								},
+								default: null,
+								description: 'OpenRouter routes requests to the best available providers for your model. By default, requests are load balanced across the top providers to maximize uptime.',
+							},
+						],
+					},
 				],
 			},
 		],
@@ -223,6 +242,9 @@ export class LmChatOpenRouter implements INodeType {
 			temperature?: number;
 			topP?: number;
 			responseFormat?: 'text' | 'json_object';
+			provider?: {
+				order: string[] | null;
+			};
 		};
 
 		const configuration: ClientOptions = {
